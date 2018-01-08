@@ -45,7 +45,7 @@ UserSchema.methods = {
         const _id = user._id.toHexString();
 
         const access = 'auth';
-        const token = jwt.sign({ _id, access }, 'abc123');
+        const token = jwt.sign({ _id, access }, process.env.JWT_SECRETE);
 
         user.tokens.push({ access, token });
 
@@ -70,7 +70,7 @@ UserSchema.statics = {
         let decoded;
 
         try {
-            decoded = jwt.verify(token, 'abc123');
+            decoded = jwt.verify(token, process.env.JWT_SECRETE);
         } catch (e) {
             return Promise.reject();
         }
