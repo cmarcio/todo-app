@@ -1,4 +1,5 @@
 const request = require('supertest');
+const expect = require('expect');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 
@@ -11,7 +12,7 @@ beforeEach(populateUsers);
 beforeEach(populateTodos);
 
 describe('POST /todos', () => {
-    test('it should create a todo', (done) => {
+    it('it should create a todo', (done) => {
         var text = 'Test todo text';
         
         const response = request(app)
@@ -33,7 +34,7 @@ describe('POST /todos', () => {
             });
     });
 
-    test('it should not create a todo with invalid body data', (done) => {
+    it('it should not create a todo with invalid body data', (done) => {
         request(app)
             .post('/todos')
             .set('x-auth', users[0].tokens[0].token)            
@@ -51,7 +52,7 @@ describe('POST /todos', () => {
 });
 
 describe('GET /todos', () => {
-    test('it should get all todos', (done) => {
+    it('it should get all todos', (done) => {
         request(app)
             .get('/todos')
             .set('x-auth', users[0].tokens[0].token)
@@ -64,7 +65,7 @@ describe('GET /todos', () => {
 });
 
 describe('GET /todos/:id', () => {
-    test('it should return a todo doc', (done) => {
+    it('it should return a todo doc', (done) => {
         request(app)
             .get(`/todos/${todos[0]._id.toHexString()}`)
             .set('x-auth', users[0].tokens[0].token)            
@@ -75,7 +76,7 @@ describe('GET /todos/:id', () => {
             .end(done);
     });
 
-    test('it should not return a todo doc created by other user', (done) => {
+    it('it should not return a todo doc created by other user', (done) => {
         request(app)
             .get(`/todos/${todos[1]._id.toHexString()}`)
             .set('x-auth', users[0].tokens[0].token)
@@ -83,7 +84,7 @@ describe('GET /todos/:id', () => {
             .end(done);
     });
 
-    test('it should return 404 if todo not found', (done) => {
+    it('it should return 404 if todo not found', (done) => {
         const hexId = new ObjectID().toHexString();
         request(app)
             .get(`/todos/${hexId}`)
@@ -92,7 +93,7 @@ describe('GET /todos/:id', () => {
             .end(done);
     });
 
-    test('it should return 404 for non-object ids', (done) => {
+    it('it should return 404 for non-object ids', (done) => {
         request(app)
             .get('/todos/123')
             .set('x-auth', users[0].tokens[0].token)            
@@ -102,7 +103,7 @@ describe('GET /todos/:id', () => {
 });
 
 describe('DELETE /todos/:id', () => {
-    test('it should remove a todo', (done) => {
+    it('it should remove a todo', (done) => {
         var hexId = todos[1]._id.toHexString();
 
         request(app)
@@ -122,7 +123,7 @@ describe('DELETE /todos/:id', () => {
             });
     });
 
-    test('it should not remove a todo from other user', (done) => {
+    it('it should not remove a todo from other user', (done) => {
         var hexId = todos[0]._id.toHexString();
 
         request(app)
@@ -139,7 +140,7 @@ describe('DELETE /todos/:id', () => {
             });
     });
 
-    test('it should return 404 if todo not found', (done) => {
+    it('it should return 404 if todo not found', (done) => {
         const hexId = new ObjectID().toHexString();
         request(app)
             .delete(`/todos/${hexId}`)
@@ -148,7 +149,7 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 
-    test('it should return 404 if object id is invalid', (done) => {
+    it('it should return 404 if object id is invalid', (done) => {
         request(app)
             .delete('/todos/123')
             .set('x-auth', users[1].tokens[0].token)            
@@ -158,7 +159,7 @@ describe('DELETE /todos/:id', () => {
 });
 
 describe('PATCH /todos/:id', () => {
-    test('it should update the todo', (done) => {
+    it('it should update the todo', (done) => {
         const id = todos[0]._id.toHexString();
         const text = 'first note updated';
         request(app)
@@ -175,7 +176,7 @@ describe('PATCH /todos/:id', () => {
             .end(done);
     });
 
-    test('it should not update the todo created by other user', (done) => {
+    it('it should not update the todo created by other user', (done) => {
         const id = todos[0]._id.toHexString();
         const text = 'first note updated';
         request(app)
@@ -186,7 +187,7 @@ describe('PATCH /todos/:id', () => {
             .end(done);
     });
 
-    test('it should clear completedAt when todo is not completed', (done) => {
+    it('it should clear completedAt when todo is not completed', (done) => {
         const id = todos[1]._id.toHexString();
         request(app)
             .patch(`/todos/${id}`)
@@ -204,7 +205,7 @@ describe('PATCH /todos/:id', () => {
 });
 
 describe('GET /users/me', () => {
-    test('it should return user if authenticated', (done) => {
+    it('it should return user if authenticated', (done) => {
         request(app)
             .get('/users/me')
             .set('x-auth', users[0].tokens[0].token)
@@ -216,7 +217,7 @@ describe('GET /users/me', () => {
             .end(done);
     });
 
-    test('it should return 401 if not authenticated', (done) => {
+    it('it should return 401 if not authenticated', (done) => {
         request(app)
             .get('/users/me')
             .expect(401)
@@ -228,7 +229,7 @@ describe('GET /users/me', () => {
 });
 
 describe('POST /users', () => {
-    test('it should create a user', (done) => {
+    it('it should create a user', (done) => {
         const email = 'example@example.com';
         const password = '123ssdf';
 
@@ -252,7 +253,7 @@ describe('POST /users', () => {
             });
     });
 
-    test('it should return validation errors if request invalid', (done) => {
+    it('it should return validation errors if request invalid', (done) => {
         request(app)
             .post('/users')
             .send({email: 'and', password: '123'})
@@ -260,7 +261,7 @@ describe('POST /users', () => {
             .end(done);
     });
 
-    test('it should not create user if email in use', (done) => {
+    it('it should not create user if email in use', (done) => {
         request(app)
             .post('/users')
             .send({email: users[0].email, password: 'mypass'})
@@ -270,7 +271,7 @@ describe('POST /users', () => {
 });
 
 describe('POST /users/login', () => {
-    test('it should login and return auth token', (done) => {
+    it('it should login and return auth token', (done) => {
         request(app)
             .post('/users/login')
             .send({
@@ -294,7 +295,7 @@ describe('POST /users/login', () => {
             });
     });
 
-    test('it should reject invalid login', (done) => {
+    it('it should reject invalid login', (done) => {
         request(app)
             .post('/users/login')
             .send({
@@ -317,7 +318,7 @@ describe('POST /users/login', () => {
 });
 
 describe('DELETE /users/me/token', () => {
-    test('it should remove auth token on logout', (done) => {
+    it('it should remove auth token on logout', (done) => {
         request(app)
             .delete('/users/me/token')
             .set('x-auth', users[0].tokens[0].token)
